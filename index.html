@@ -21,33 +21,33 @@
     <!-- KARAKTER SEÇİM EKRANI -->
     <div id="character-screen" class="screen hidden interactive">
         <h1 class="title">Kahramanını Seç</h1>
-        <p class="subtitle">Nexus Şehrini korumak için 3D önizlemeli kahramanını seç</p>
+        <p class="subtitle">Nexus Şehrini korumak için kahramanını seç</p>
         
         <div class="hero-select-container">
             <!-- Iron Man Kartı -->
-            <div class="hero-card" onclick="playAudio('click'); selectHero('Iron Man', 0xff4757)">
-                <div class="preview-box" id="preview-ironman"></div>
+            <div class="hero-card" data-hero="Iron Man" data-color="0xff4757">
+                <div class="preview-box"><canvas id="preview-ironman"></canvas></div>
                 <h3>Iron Man</h3>
                 <span class="hero-tag" style="color: #ff4757;">Teknolojik Güç</span>
             </div>
 
             <!-- Thor Kartı -->
-            <div class="hero-card" onclick="playAudio('click'); selectHero('Thor', 0x3498db)">
-                <div class="preview-box" id="preview-thor"></div>
+            <div class="hero-card" data-hero="Thor" data-color="0x3498db">
+                <div class="preview-box"><canvas id="preview-thor"></canvas></div>
                 <h3>Thor</h3>
                 <span class="hero-tag" style="color: #3498db;">Yıldırım Gücü</span>
             </div>
 
             <!-- Spider-Man Kartı -->
-            <div class="hero-card" onclick="playAudio('click'); selectHero('Spider-Man', 0xe67e22)">
-                <div class="preview-box" id="preview-spiderman"></div>
+            <div class="hero-card" data-hero="Spider-Man" data-color="0xe67e22">
+                <div class="preview-box"><canvas id="preview-spiderman"></canvas></div>
                 <h3>Spider-Man</h3>
                 <span class="hero-tag" style="color: #e67e22;">Çeviklik</span>
             </div>
 
             <!-- Captain Marvel Kartı -->
-            <div class="hero-card" onclick="playAudio('click'); selectHero('Captain Marvel', 0xf1c40f)">
-                <div class="preview-box" id="preview-marvel"></div>
+            <div class="hero-card" data-hero="Captain Marvel" data-color="0xf1c40f">
+                <div class="preview-box"><canvas id="preview-marvel"></canvas></div>
                 <h3>Captain Marvel</h3>
                 <span class="hero-tag" style="color: #f1c40f;">Kozmik Güç</span>
             </div>
@@ -101,7 +101,7 @@
         </div>
 
         <!-- MOBİL DOKUNMATİK KONTROL PANELİ -->
-        <div class="touch-controls">
+    <div class="touch-controls">
             <div class="d-pad">
                 <div></div>
                 <button class="control-btn" ontouchstart="setMove('up', true)" ontouchend="setMove('up', false)" onmousedown="setMove('up', true)" onmouseup="setMove('up', false)">⬆️</button>
@@ -121,5 +121,4 @@
 
     <script src="script.js"></script>
 </body>
-                    </html>
-                    
+</html>
