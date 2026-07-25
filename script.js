@@ -7,15 +7,20 @@ let score = 0;
 let dayCount = 1;
 let selectedHeroName = "Bilinmeyen";
 let selectedHeroColor = 0x66fcf1;
+let previewAnimations = [];
 
 let audioCtx = null;
 
 function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    } catch (e) {
+        console.log("AudioContext desteklenmiyor veya engellendi.");
     }
 }
 
@@ -23,51 +28,72 @@ function playAudio(type) {
     initAudio();
     if (!audioCtx) return;
 
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
 
-    if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-    } else if (type === 'transform') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-    } else if (type === 'defeat') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
-    } else if (type === 'alert') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(300, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-    }
+        if (type === 'click') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        } else if (type === 'transform') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'defeat') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+        } else if (type === 'alert') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
+    } catch (e) {}
 }
 
 window.addEventListener('DOMContentLoaded', () => {
     const splashScreen = document.getElementById('splash-screen');
     if (splashScreen) {
-        splashScreen.addEventListener('click', () => {
+        const handleSplashInteraction = (e) => {
+            e.preventDefault();
             initAudio();
             playAudio('click');
             showCharacterSelect();
-        });
+        };
+        splashScreen.addEventListener('click', handleSplashInteraction);
+        splashScreen.addEventListener('touchend', handleSplashInteraction, { passive: false });
     }
+
+    // Karakter kartlarına hem tıklama hem dokunma olayını dinamik ve güvenli şekilde bağlıyoruz
+    const heroCards = document.querySelectorAll('.hero-card');
+    heroCards.forEach(card => {
+        const heroName = card.getAttribute('data-hero');
+        const heroColor = parseInt(card.getAttribute('data-color'));
+
+        const handleCardSelection = (e) => {
+            e.preventDefault();
+            playAudio('click');
+            selectHero(heroName, heroColor);
+        };
+
+        card.addEventListener('click', handleCardSelection);
+        card.addEventListener('touchend', handleCardSelection, { passive: false });
+    });
 });
 
 const screens = ['splash-screen', 'character-screen', 'menu-screen', 'howto-screen', 'missions-screen'];
@@ -80,19 +106,21 @@ function showScreen(screenId) {
     const target = document.getElementById(screenId);
     if(target) target.classList.remove('hidden');
 
-    if(screenId === 'game-hud') {
-        document.getElementById('game-hud').classList.remove('hidden');
-    } else {
-        document.getElementById('game-hud').classList.add('hidden');
+    const hud = document.getElementById('game-hud');
+    if(hud) {
+        if(screenId === 'game-hud') {
+            hud.classList.remove('hidden');
+        } else {
+            hud.classList.add('hidden');
+        }
     }
 }
 
 function showCharacterSelect() {
     showScreen('character-screen');
-    setTimeout(initCharacterPreviews, 100); // UI DOM oturduktan sonra 3D önizlemeleri yükle
+    setTimeout(initCharacterPreviews, 50);
 }
 
-// Seçim Ekranı İçin 3D Karakter Önizlemeleri Oluşturucu
 function initCharacterPreviews() {
     const previews = [
         { id: 'preview-ironman', color: 0xff4757 },
@@ -101,75 +129,79 @@ function initCharacterPreviews() {
         { id: 'preview-marvel', color: 0xf1c40f }
     ];
 
-    previews.forEach(p => {
-        const container = document.getElementById(p.id);
-        if (!container || container.hasChildNodes()) return;
+    previewAnimations = [];
 
-        const w = container.clientWidth;
-        const h = container.clientHeight;
+    previews.forEach(p => {
+        const canvas = document.getElementById(p.id);
+        if (!canvas) return;
+
+        const parent = canvas.parentElement;
+        const w = parent.clientWidth || 150;
+        const h = parent.clientHeight || 95;
 
         const pScene = new THREE.Scene();
-        pScene.background = new THREE.Color(0x0e1116);
+        pScene.background = new THREE.Color(0x0a0c10);
 
-        const pCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 50);
-        pCamera.position.set(0, 2.2, 5);
-        pCamera.lookAt(0, 1.8, 0);
+        const pCamera = new THREE.PerspectiveCamera(40, w / h, 0.1, 50);
+        pCamera.position.set(0, 2.2, 4.8);
+        pCamera.lookAt(0, 1.7, 0);
 
-        const pRenderer = new THREE.WebGLRenderer({ antialias: true });
-        pRenderer.setSize(w, h);
-        container.appendChild(pRenderer.domElement);
+        const pRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        pRenderer.setSize(w, h, false);
 
-        const light = new THREE.DirectionalLight(0xffffff, 1);
+        const light = new THREE.DirectionalLight(0xffffff, 1.2);
         light.position.set(2, 4, 3);
         pScene.add(light);
-        pScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        pScene.add(new THREE.AmbientLight(0xffffff, 0.7));
 
-        // Mini 3D Karakter Grubu
         const group = new THREE.Group();
         const mat = new THREE.MeshStandardMaterial({ color: p.color, roughness: 0.3, metalness: 0.5 });
         const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac, roughness: 0.5 });
 
-        // Kafa
         const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.5), skinMat);
-        head.position.y = 2.8;
+        head.position.y = 2.7;
         group.add(head);
 
-        // Gövde
         const body = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.3, 0.5), mat);
-        body.position.y = 1.8;
+        body.position.y = 1.7;
         group.add(body);
 
-        // Kollar
         const armGeo = new THREE.BoxGeometry(0.3, 1.1, 0.3);
         const leftArm = new THREE.Mesh(armGeo, mat);
-        leftArm.position.set(-0.65, 1.8, 0);
+        leftArm.position.set(-0.65, 1.7, 0);
         group.add(leftArm);
 
         const rightArm = new THREE.Mesh(armGeo, mat);
-        rightArm.position.set(0.65, 1.8, 0);
+        rightArm.position.set(0.65, 1.7, 0);
         group.add(rightArm);
 
-        // Bacaklar
         const legGeo = new THREE.BoxGeometry(0.35, 1.1, 0.35);
         const legMat = new THREE.MeshStandardMaterial({ color: 0x1f2833 });
         const leftLeg = new THREE.Mesh(legGeo, legMat);
-        leftLeg.position.set(-0.25, 0.6, 0);
+        leftLeg.position.set(-0.25, 0.55, 0);
         group.add(leftLeg);
 
         const rightLeg = new THREE.Mesh(legGeo, legMat);
-        rightLeg.position.set(0.25, 0.6, 0);
+        rightLeg.position.set(0.25, 0.55, 0);
         group.add(rightLeg);
 
         pScene.add(group);
 
-        // Hafifçe döndürerek canlı durmasını sağla
-        function animatePreview() {
-            requestAnimationFrame(animatePreview);
-            group.rotation.y += 0.015;
+        function renderPreview() {
+            group.rotation.y += 0.02;
             pRenderer.render(pScene, pCamera);
         }
-        animatePreview();
+        previewAnimations.push(renderPreview);
     });
+
+    function runPreviews() {
+        const charScreen = document.getElementById('character-screen');
+        if (charScreen && !charScreen.classList.contains('hidden')) {
+            previewAnimations.forEach(anim => anim());
+            requestAnimationFrame(runPreviews);
+        }
+    }
+    runPreviews();
 }
 
 function selectHero(name, color) {
@@ -382,6 +414,7 @@ function toggleTransformation() {
 
 function triggerNotif(text) {
     const notif = document.getElementById('notif');
+    if (!notif) return;
     notif.innerText = text;
     notif.classList.add('show');
     setTimeout(() => notif.classList.remove('show'), 2000);
@@ -471,8 +504,10 @@ function animate() {
 }
 
 window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    if(camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
 });
-            
+        
