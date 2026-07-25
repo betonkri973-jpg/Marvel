@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Marvel: Nexus Sıçraması</title>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --panel-bg: rgba(31, 40, 51, 0.95);
+            --accent-color: #66fcf1;
+            --text-color: #c5c6c7;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            background: linear-gradient(135deg, #0b0c10 0%, #1f2833 100%);
+            border: 3px solid var(--accent-color);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(102, 252, 241, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, #0b0c10 0%, #1f2833 100%);
+            z-index: 10;
+            transition: opacity 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .title {
+            font-size: 1.6rem;
+            color: #66fcf1;
+            text-align: center;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.4);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #c5c6c7;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 260px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #45a29e, #66fcf1);
+            border: none;
+            color: #0b0c10;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+            text-align: center;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #45a29e;
+            color: #66fcf1;
+        }
+
+        .panel-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(102, 252, 241, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+            width: 100%;
+            max-width: 320px;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .game-canvas-area {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .hud {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #66fcf1;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        #hero {
+            position: absolute;
+            bottom: 30px;
+            left: 170px;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #66fcf1 0%, #45a29e 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 15px #66fcf1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+
+        .cosmic-item {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* Seviye Atlama / Ödül Bildirim Overlay */
+        .notification-overlay {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(69, 162, 158, 0.95);
+            color: #0b0c10;
+            padding: 15px 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(102, 252, 241, 0.8);
+            z-index: 100;
+            text-transform: uppercase;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .notification-overlay.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Bildirim Paneli (Seviye Atlandığında veya Ödül Alındığında) -->
+        <div id="notif-box" class="notification-overlay">SEVİYE ATLADIN!<br><span id="notif-sub" style="font-size: 0.85rem;">Hız Artıyor! 🚀</span></div>
+
+        <!-- 1. GİRİŞ EKRANI (Beton Archive Sunar) -->
+        <div id="splash-screen" class="screen" style="cursor: pointer;" onclick="goToMenu()">
+            <h2 style="font-size: 1.1rem; color: #66fcf1; letter-spacing: 3px; margin-bottom: 8px;">BETON ARCHİVE</h2>
+            <h1 class="title" style="font-size: 1.8rem;">SUNAR</h1>
+            <p style="color: #888; font-size: 0.85rem; margin-top: 25px;">Giriş için dokun</p>
+        </div>
+
+        <!-- 2. ANA MENÜ EKRANI -->
+        <div id="menu-screen" class="screen hidden">
+            <h1 class="title">Nexus Sıçraması</h1>
+            <p class="subtitle">Marvel Kozmik Macera</p>
+            <div class="menu-buttons">
+                <button class="btn" onclick="startGame()">Oyunu Oyna</button>
+                <button class="btn btn-secondary" onclick="showScreen('howto-screen')">Nasıl Oynanır?</button>
+                <button class="btn btn-secondary" onclick="showScreen('score-screen')">Skor</button>
+                <button class="btn btn-secondary" onclick="showScreen('achievements-screen')">Başarımlar</button>
+            </div>
+        </div>
+
+        <!-- 3. NASIL OYNANIR -->
+        <div id="howto-screen" class="screen hidden">
+            <h1 class="title">Nasıl Oynanır?</h1>
+            <div class="panel-box">
+                • Parmağını veya fareyi sağa sola kaydırarak kalkanı yönet.<br>
+                • 💎 Kozmik kristalleri toplayarak puan ve tecrübe kazan.<br>
+                • ⚠️ Zaman anomalilerinden kaç, enerji kaybetme!<br>
+                • Her 50 puanda bir <b>Seviye Atla</b>, hız ve zorluk artsın!
+            </div>
+            <button class="btn" onclick="goToMenu()" style="max-width: 200px;">Geri Dön</button>
+        </div>
+
+        <!-- 4. SKOR EKRANI -->
+        <div id="score-screen" class="screen hidden">
+            <h1 class="title">En Yüksek Skor</h1>
+            <div class="panel-box" style="text-align: center; font-size: 1.4rem; color: #66fcf1;" id="high-score-display">
+                0 Puan
+            </div>
+            <button class="btn" onclick="goToMenu()" style="max-width: 200px;">Geri Dön</button>
+        </div>
+
+        <!-- 5. BAŞARIMLAR EKRANI -->
+        <div id="achievements-screen" class="screen hidden">
+            <h1 class="title">Başarımlar & Ödüller</h1>
+            <div class="panel-box">
+                🏆 <b>Kozmik Çaylak:</b> Level 2'ye ulaş <span id="ach-1" style="color:#ff4; float:right;">(Kilitli)</span><br><br>
+                🏆 <b>Zaman Bükücü:</b> 100 puana ulaş <span id="ach-2" style="color:#ff4; float:right;">(Kilitli)</span><br><br>
+                🏆 <b>Galaksi Muhafızı:</b> Level 5'e ulaş <span id="ach-3" style="color:#ff4; float:right;">(Kilitli)</span>
+            </div>
+            <button class="btn" onclick="goToMenu()" style="max-width: 200px;">Geri Dön</button>
+        </div>
+
+        <!-- 6. OYUN EKRANI -->
+        <div id="game-screen" class="screen hidden" style="padding: 0;">
+            <div class="hud">
+                <span id="score-text">Skor: 0</span>
+                <span id="level-text">Level: 1</span>
+                <span id="lives-text">⚡⚡⚡</span>
+            </div>
+            <div class="game-canvas-area" id="canvas-area">
+                <div id="hero">🛡️</div>
+            </div>
+        </div>
+
+        <!-- 7. OYUN BİTTİ EKRANI -->
+        <div id="gameover-screen" class="screen hidden">
+            <h1 class="title">Görev Tamamlandı</h1>
+            <p class="subtitle" id="final-score-text">Kozmik Skorun: 0</p>
+            <button class="btn" onclick="startGame()">Tekrar Oyna</button>
+            <button class="btn btn-secondary" onclick="goToMenu()" style="margin-top: 10px;">Ana Menü</button>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Ses Motoru
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'collect') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } else if (type === 'levelup') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'damage') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // Ekran Yönetimi
+        const screens = ['splash-screen', 'menu-screen', 'howto-screen', 'score-screen', 'achievements-screen', 'game-screen', 'gameover-screen'];
+        
+        function showScreen(screenId) {
+            playSound('collect');
+            screens.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function goToMenu() {
+            showScreen('menu-screen');
+            clearInterval(gameInterval);
+            clearInterval(spawnInterval);
+            clearItems();
+        }
+
+        const canvasArea = document.getElementById("canvas-area");
+        const hero = document.getElementById("hero");
+        const scoreText = document.getElementById("score-text");
+        const levelText = document.getElementById("level-text");
+        const livesText = document.getElementById("lives-text");
+        const finalScoreText = document.getElementById("final-score-text");
+        const highScoreDisplay = document.getElementById("high-score-display");
+        const notifBox = document.getElementById("notif-box");
+        const notifSub = document.getElementById("notif-sub");
+
+        let score = 0;
+        let highScore = 0;
+        let lives = 3;
+        let level = 1;
+        let gameInterval;
+        let spawnInterval;
+        let items = [];
+        let heroX = 175;
+        let fallSpeed = 3.5;
+        const containerWidth = 400;
+        const containerHeight = 600;
+
+        // Başarımlar Durumu
+        let ach1 = false, ach2 = false, ach3 = false;
+
+        canvasArea.addEventListener('pointermove', (e) => {
+            const rect = canvasArea.getBoundingClientRect();
+            heroX = e.clientX - rect.left - 25;
+            if (heroX < 0) heroX = 0;
+            if (heroX > containerWidth - 50) heroX = containerWidth - 50;
+            hero.style.left = heroX + 'px';
+        });
+
+        function startGame() {
+            showScreen('game-screen');
+            score = 0;
+            lives = 3;
+            level = 1;
+            fallSpeed = 3.5;
+            updateHUD();
+            clearItems();
+
+            clearInterval(gameInterval);
+            clearInterval(spawnInterval);
+
+            gameInterval = setInterval(updateGame, 20);
+            spawnInterval = setInterval(spawnItem, 800);
+        }
+
+        function clearItems() {
+            items.forEach(i => i.element.remove());
+            items = [];
+        }
+
+        function spawnItem() {
+            const types = ['energy', 'energy', 'anomaly'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            const el = document.createElement('div');
+            el.className = 'cosmic-item';
+            
+            if (type === 'energy') el.innerText = '💎';
+            else el.innerText = '⚠️';
+
+            const x = Math.random() * (containerWidth - 35);
+            const y = -35;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+
+            canvasArea.appendChild(el);
+            items.push({ element: el, x: x, y: y, type: type });
+        }
+
+        function updateGame() {
+            for (let i = items.length - 1; i >= 0; i--) {
+                let item = items[i];
+                item.y += fallSpeed;
+                item.element.style.top = item.y + 'px';
+
+                if (item.y >= containerHeight - 95 && item.y <= containerHeight - 35) {
+                    if (item.x + 30 >= heroX && item.x <= heroX + 50) {
+                        handleCollision(item);
+                        item.element.remove();
+                        items.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                if (item.y > containerHeight) {
+                    item.element.remove();
+                    items.splice(i, 1);
+                }
+            }
+        }
+
+        function handleCollision(item) {
+            if (item.type === 'energy') {
+                score += 10;
+                playSound('collect');
+                checkProgression();
+            } else {
+                lives--;
+                playSound('damage');
+            }
+            updateHUD();
+
+            if (lives <= 0) {
+                endGame();
+            }
+        }
+
+        function checkProgression() {
+            // Her 50 puanda bir Level Atla
+            let newLevel = Math.floor(score / 50) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                fallSpeed += 0.8; // Hız artar
+                triggerNotification(`SEVİYE ${level}!`, `Hız ve Zorluk Arttı! 🚀`);
+                playSound('levelup');
+            }
+
+            // Başarımlar kontrolü
+            if (level >= 2 && !ach1) { ach1 = true; document.getElementById('ach-1').innerText = "(Tamamlandı!)"; document.getElementById('ach-1').style.color = "#66fcf1"; }
+            if (score >= 100 && !ach2) { ach2 = true; document.getElementById('ach-2').innerText = "(Tamamlandı!)"; document.getElementById('ach-2').style.color = "#66fcf1"; }
+            if (level >= 5 && !ach3) { ach3 = true; document.getElementById('ach-3').innerText = "(Tamamlandı!)"; document.getElementById('ach-3').style.color = "#66fcf1"; }
+        }
+
+        function triggerNotification(title, sub) {
+            notifBox.innerHTML = `${title}<br><span style="font-size: 0.85rem;">${sub}</span>`;
+            notifBox.classList.add("show");
+            setTimeout(() => {
+                notifBox.classList.remove("show");
+            }, 1500);
+        }
+
+        function updateHUD() {
+            scoreText.innerText = `Skor: ${score}`;
+            levelText.innerText = `Level: ${level}`;
+            let batteries = '';
+            for (let i = 0; i < lives; i++) batteries += '⚡';
+            livesText.innerText = batteries;
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            clearInterval(spawnInterval);
+            clearItems();
+
+            if (score > highScore) {
+                highScore = score;
+            }
+            highScoreDisplay.innerText = `${highScore} Puan`;
+            finalScoreText.innerText = `Kozmik Skorun: ${score}`;
+            showScreen('gameover-screen');
+        }
+    </script>
+</body>
+  </html>
+  
