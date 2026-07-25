@@ -21,12 +21,36 @@
     <!-- KARAKTER SEÇİM EKRANI -->
     <div id="character-screen" class="screen hidden interactive">
         <h1 class="title">Kahramanını Seç</h1>
-        <p class="subtitle">Nexus Şehrini korumak için bir Marvel karakteri seç</p>
-        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px;">
-            <button class="btn" onclick="playAudio('click'); selectHero('Iron Man', 0xff4757)">🔴 Iron Man</button>
-            <button class="btn" onclick="playAudio('click'); selectHero('Thor', 0x3498db)">⚡ Thor</button>
-            <button class="btn" onclick="playAudio('click'); selectHero('Spider-Man', 0xe67e22)">🕸️ Spider-Man</button>
-            <button class="btn" onclick="playAudio('click'); selectHero('Captain Marvel', 0xf1c40f)">⭐ Captain Marvel</button>
+        <p class="subtitle">Nexus Şehrini korumak için 3D önizlemeli kahramanını seç</p>
+        
+        <div class="hero-select-container">
+            <!-- Iron Man Kartı -->
+            <div class="hero-card" onclick="playAudio('click'); selectHero('Iron Man', 0xff4757)">
+                <div class="preview-box" id="preview-ironman"></div>
+                <h3>Iron Man</h3>
+                <span class="hero-tag" style="color: #ff4757;">Teknolojik Güç</span>
+            </div>
+
+            <!-- Thor Kartı -->
+            <div class="hero-card" onclick="playAudio('click'); selectHero('Thor', 0x3498db)">
+                <div class="preview-box" id="preview-thor"></div>
+                <h3>Thor</h3>
+                <span class="hero-tag" style="color: #3498db;">Yıldırım Gücü</span>
+            </div>
+
+            <!-- Spider-Man Kartı -->
+            <div class="hero-card" onclick="playAudio('click'); selectHero('Spider-Man', 0xe67e22)">
+                <div class="preview-box" id="preview-spiderman"></div>
+                <h3>Spider-Man</h3>
+                <span class="hero-tag" style="color: #e67e22;">Çeviklik</span>
+            </div>
+
+            <!-- Captain Marvel Kartı -->
+            <div class="hero-card" onclick="playAudio('click'); selectHero('Captain Marvel', 0xf1c40f)">
+                <div class="preview-box" id="preview-marvel"></div>
+                <h3>Captain Marvel</h3>
+                <span class="hero-tag" style="color: #f1c40f;">Kozmik Güç</span>
+            </div>
         </div>
     </div>
 
@@ -46,7 +70,7 @@
         <h1 class="title">Nasıl Oynanır?</h1>
         <div class="panel-box">
             • <b>Gündüz / Gece Döngüsü:</b> Gündüzleri sivil kimlikle gez, gece veya tehlike anında <b>"Özel Güç"</b> butonuna basarak seçtiğin kahramana dönüş.<br>
-            • <b>Kontroller:</b> W, A, S, D veya ok tuşlarıyla karakterini yönet.<br>
+            • <b>Kontroller:</b> Ekrandaki yön tuşlarını veya klavyeyi kullan.<br>
             • <b>Görevler:</b> Şehirdeki düşmanları alt et ve her gün artan zorluklara karşı hayatta kal!
         </div>
         <button class="btn" onclick="playAudio('click'); goToMenu()">Geri Dön</button>
@@ -75,9 +99,19 @@
                 <span id="hud-day">Gün: 1</span>
             </div>
         </div>
-        <div class="hud-bottom">
-            <div style="background: rgba(0,0,0,0.6); padding: 10px; border-radius: 10px; border: 1px solid #45a29e;">
-                <span id="hud-hero-info">Aktif Kahraman: -</span>
+
+        <!-- MOBİL DOKUNMATİK KONTROL PANELİ -->
+        <div class="touch-controls">
+            <div class="d-pad">
+                <div></div>
+                <button class="control-btn" ontouchstart="setMove('up', true)" ontouchend="setMove('up', false)" onmousedown="setMove('up', true)" onmouseup="setMove('up', false)">⬆️</button>
+                <div></div>
+                <button class="control-btn" ontouchstart="setMove('left', true)" ontouchend="setMove('left', false)" onmousedown="setMove('left', true)" onmouseup="setMove('left', false)">⬅️</button>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                <button class="control-btn" ontouchstart="setMove('right', true)" ontouchend="setMove('right', false)" onmousedown="setMove('right', true)" onmouseup="setMove('right', false)">➡️</button>
+                <div></div>
+                <button class="control-btn" ontouchstart="setMove('down', true)" ontouchend="setMove('down', false)" onmousedown="setMove('down', true)" onmouseup="setMove('down', false)">⬇️</button>
+                <div></div>
             </div>
             <button class="action-btn interactive" id="transform-btn" onclick="playAudio('transform'); toggleTransformation()">🦸‍♂️ GÜÇLERİ AÇ</button>
         </div>
@@ -87,4 +121,5 @@
 
     <script src="script.js"></script>
 </body>
-</html>
+    </html>
+            
