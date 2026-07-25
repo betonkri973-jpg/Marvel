@@ -8,12 +8,21 @@ let selectedHeroName = "Bilinmeyen";
 let selectedHeroColor = 0x66fcf1;
 
 // Web Audio API ile Ses Efektleri Üreteci
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx = null;
 
-function playAudio(type) {
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
+}
+
+function playAudio(type) {
+    initAudio();
+    if (!audioCtx) return;
+
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain);
@@ -48,6 +57,12 @@ function playAudio(type) {
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
         osc.start(); osc.stop(audioCtx.currentTime + 0.3);
     }
+}
+
+function handleSplashTouch() {
+    initAudio();
+    playAudio('click');
+    showCharacterSelect();
 }
 
 const screens = ['splash-screen', 'character-screen', 'menu-screen', 'howto-screen', 'missions-screen'];
@@ -257,4 +272,4 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
-          
+        
